@@ -17,6 +17,10 @@
 #include "flutter/shell/platform/embedder/tests/embedder_test_context_metal.h"
 #endif
 
+#ifdef SHELL_ENABLE_VULKAN
+#include "flutter/shell/platform/embedder/tests/embedder_test_context_vulkan.h"
+#endif
+
 namespace flutter {
 namespace testing {
 
@@ -71,6 +75,10 @@ EmbedderConfigBuilder::EmbedderConfigBuilder(
 
 #ifdef SHELL_ENABLE_METAL
   InitializeMetalRendererConfig();
+#endif
+
+#ifdef SHELL_ENABLE_VULKAN
+  InitializeVulkanRendererConfig();
 #endif
 
   software_renderer_config_.struct_size = sizeof(FlutterSoftwareRendererConfig);
@@ -412,6 +420,49 @@ void EmbedderConfigBuilder::InitializeMetalRendererConfig() {
 }
 
 #endif  // SHELL_ENABLE_METAL
+
+#ifdef SHELL_ENABLE_VULKAN
+
+void EmbedderConfigBuilder::InitializeVulkanRendererConfig()
+{
+  if (context_.GetContextType() != EmbedderTestContextType::kVulkanContext) {
+    return;
+  }
+
+  vulkan_renderer_config_.struct_size = sizeof(FlutterVulkanRendererConfig);
+
+  EmbedderTestContextVulkan& vulkan_context = 
+            reinterpret_cast<EmbedderTestContextVulkan&>(context_);
+
+  vulkan_renderer_config_.device = vulkan_context.GetTestVulkanContext()->GetVulkanDevice();
+
+  vulkan_renderer_config_.present_command_pool = vulkan_context.GetTestVulkanContext()->GetVulkanPresentCommandPool();
+
+  vulkan_renderer_config_.get_next_drawable_callback =
+      [](void* user_data, const FlutterFrameInfo* frame_info) {
+        EmbedderTestContextVulkan* vulkan_context =
+            reinterpret_cast<EmbedderTestContextVulkan*>(user_data);
+        SkISize surface_size =
+            SkISize::Make(frame_info->size.width, frame_info->size.height);
+        TestVulkanContext::TextureInfo texture_info =
+            vulkan_context->GetTestVulkanContext()->CreateVulkanTexture(
+                surface_size);
+        FlutterVulkanTexture texture;
+        texture.struct_size = sizeof(FlutterVulkanTexture);
+        texture.texture_id = texture_info.texture_id;
+        texture.texture =
+            reinterpret_cast<FlutterVulkanImageHandle>(texture_info.texture);
+        return texture;
+      };
+  vulkan_renderer_config_.present_drawable_callback =
+      [](void* user_data, const FlutterVulkanTexture* texture) -> bool {
+    EmbedderTestContextVulkan* vulkan_context =
+        reinterpret_cast<EmbedderTestContextVulkan*>(user_data);
+    return vulkan_context->Present(texture->texture_id);
+  };
+}
+
+#endif  // SHELL_ENABLE_VULKAN
 
 }  // namespace testing
 }  // namespace flutter

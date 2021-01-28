@@ -48,6 +48,8 @@ class EmbedderConfigBuilder {
 
   void SetOpenGLRendererConfig(SkISize surface_size);
 
+  void SetVulkanRendererConfig(SkISize surface_size);
+
   void SetMetalRendererConfig(SkISize surface_size);
 
   // Used to explicitly set an `open_gl.fbo_callback`. Using this method will
@@ -109,6 +111,10 @@ class EmbedderConfigBuilder {
 #ifdef SHELL_ENABLE_METAL
   void InitializeMetalRendererConfig();
   FlutterMetalRendererConfig metal_renderer_config_ = {};
+#endif
+#ifdef SHELL_ENABLE_VULKAN
+  void InitializeVulkanRendererConfig();
+  FlutterVulkanRendererConfig vulkan_renderer_config_ = {};
 #endif
   std::string dart_entrypoint_;
   FlutterCustomTaskRunners custom_task_runners_ = {};
