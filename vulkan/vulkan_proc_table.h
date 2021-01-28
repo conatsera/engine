@@ -105,14 +105,18 @@ class VulkanProcTable : public fml::RefCountedThreadSafe<VulkanProcTable> {
   DEFINE_PROC(ResetCommandBuffer);
   DEFINE_PROC(ResetFences);
   DEFINE_PROC(WaitForFences);
-#if OS_ANDROID
+#if OS_ANDROID || OS_LINUX
   DEFINE_PROC(GetPhysicalDeviceSurfaceCapabilitiesKHR);
   DEFINE_PROC(GetPhysicalDeviceSurfaceFormatsKHR);
   DEFINE_PROC(GetPhysicalDeviceSurfacePresentModesKHR);
   DEFINE_PROC(GetPhysicalDeviceSurfaceSupportKHR);
   DEFINE_PROC(GetSwapchainImagesKHR);
   DEFINE_PROC(QueuePresentKHR);
+#endif
+#if OS_ANDROID
   DEFINE_PROC(CreateAndroidSurfaceKHR);
+#elif OS_LINUX
+  DEFINE_PROC(CreateXcbSurfaceKHR);
 #endif  // OS_ANDROID
 #if OS_FUCHSIA
   DEFINE_PROC(CreateBufferCollectionFUCHSIA);
