@@ -452,7 +452,7 @@ typedef struct {
   size_t struct_size;
   /// Embedder provided unique identifier to the texture buffer. Given that the
   /// `texture` handle is passed to the engine to render to, the texture buffer
-  /// is itseld owned by the embedder. This `texture_id` is then also given to
+  /// is itself owned by the embedder. This `texture_id` is then also given to
   /// the embedder in the present callback.
   int64_t texture_id;
   /// Handle to the MTLTexture that is owned by the embedder. Engine will render
@@ -486,6 +486,55 @@ typedef struct {
   /// texture to the user.
   FlutterMetalPresentCallback present_drawable_callback;
 } FlutterMetalRendererConfig;
+
+/// Alias for VkDevice.
+typedef const void* FlutterVulkanDeviceHandle;
+
+/// Alias for VkCommandPool.
+typedef const void* FlutterVulkanCommandPoolHandle;
+
+/// Alias for VkImage.
+typedef const void* FlutterVulkanImageHandle;
+
+typedef struct {
+  /// The size of this struct. Must be sizeof(FlutterVulkanTexture).
+  size_t struct_size;
+  /// Embedder provided unique identifier to the texture buffer. Given that the
+  /// `texture` handle is passed to the engine to render to, the texture buffer
+  /// is itself owned by the embedder. This `texture_id` is then also given to
+  /// the embedder in the present callback.
+  int64_t texture_id;
+  /// Handle to the VkImage that is owned by the embedder. Engine will render
+  /// the frame into this texture.
+  FlutterVulkanImageHandle texture;
+} FlutterVulkanTexture;
+
+/// Callback for when a vulkan texture is requested.
+typedef FlutterVulkanTexture (*FlutterVulkanTextureCallback)(
+    void* /* user data */,
+    const FlutterFrameInfo* /* frame info */);
+
+/// Callback for when a vulkan texture is presented. The texture_id here
+/// corresponds to the texture_id provided by the embedder in the
+/// `FlutterVulkanTextureCallback` callback.
+typedef bool (*FlutterVulkanPresentCallback)(
+    void* /* user data */,
+    const FlutterVulkanTexture* /* texture */);
+
+typedef struct {
+  /// The size of this struct. Must be sizeof(FlutterVulkanRendererConfig).
+  size_t struct_size;
+  /// Alias for VkDevice.
+  FlutterVulkanDeviceHandle device;
+  /// Alias for VkCommandPool.
+  FlutterVulkanCommandPoolHandle present_command_pool;
+  /// The callback that gets invoked when the engine requests the embedder for a
+  /// texture to render to.
+  FlutterVulkanTextureCallback get_next_drawable_callback;
+  /// The callback presented to the embedder to present a fully populated vulkan
+  /// texture to the user.
+  FlutterVulkanPresentCallback present_drawable_callback;
+} FlutterVulkanRendererConfig;
 
 typedef struct {
   /// The size of this struct. Must be sizeof(FlutterSoftwareRendererConfig).
