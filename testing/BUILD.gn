@@ -98,9 +98,16 @@ if (enable_unittests) {
   source_set("vulkan") {
     testonly = true
 
+    sources = [
+      "test_vulkan_context.cc",
+      "test_vulkan_context.h",
+    ]
+
     deps = [
       ":skia",
       "//flutter/fml",
+      "//flutter/vulkan:vulkan",
+      "//flutter/shell/gpu:gpu_surface_vulkan",
     ]
 
     # SwiftShader only supports x86/x64_64
