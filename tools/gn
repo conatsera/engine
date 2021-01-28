@@ -79,8 +79,8 @@ def to_gn_args(args):
         if args.target_os == 'android':
             raise Exception('--simulator is not supported on Android')
 
-    if args.target_os != 'android' and args.enable_vulkan:
-      raise Exception('--enable-vulkan is only supported on Android')
+    #if args.target_os != 'android' and args.enable_vulkan:
+    #  raise Exception('--enable-vulkan is only supported on Android')
 
     runtime_mode = args.runtime_mode
 
