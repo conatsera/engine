@@ -11,16 +11,21 @@
 #include "third_party/skia/include/gpu/GrDirectContext.h"
 #include "third_party/skia/include/gpu/vk/GrVkTypes.h"
 
-#include "flutter/shell/gpu/gpu_surface_vulkan.h"
+#include "flutter/vulkan/vulkan_application.h"
+#include "flutter/vulkan/vulkan_native_surface.h"
 
 namespace flutter {
 
 // A wrapper around vulkan::VulkanWindow to provide just what is needed for testing
 class TestVulkanContext {
  public:
+  typedef struct {
+    VkImage image;
+    VkImageView view;
+  } VulkanTexture;
   struct TextureInfo {
     int64_t texture_id;
-    void* texture;
+    VkImage texture;
   };
 
   TestVulkanContext();
@@ -41,9 +46,17 @@ class TestVulkanContext {
   TextureInfo GetTextureInfo(int64_t texture_id);
 
  private:
+  bool CreateSkiaBackendContext(GrVkBackendContext* context);
   sk_sp<GrDirectContext> skia_context_;
 
-  std::unique_ptr<GPUSurfaceVulkan> vulkan_surface_;
+  fml::RefPtr<vulkan::VulkanProcTable> proc_table_;
+
+  std::unique_ptr<vulkan::VulkanNativeSurface> vulkan_native_surface_;
+  std::unique_ptr<vulkan::VulkanApplication> vulkan_app_;
+
+  std::mutex textures_mutex; // Guards both texture_id_ctr_ and textures_
+  int64_t texture_id_ctr_ = 1;
+  std::map<int64_t, VkImage> textures_;
 };
 
 }  // namespace flutter
