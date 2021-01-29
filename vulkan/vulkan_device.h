@@ -45,6 +45,10 @@ class VulkanDevice {
   [[nodiscard]] bool GetPhysicalDeviceFeatures(
       VkPhysicalDeviceFeatures* features) const;
 
+  [[nodiscard]] uint32_t GetPhysicalDeviceMemoryTypeIndex(
+      uint32_t memory_type_bits,
+      VkMemoryPropertyFlagBits memory_property_flag_bits) const;
+
   [[nodiscard]] bool GetPhysicalDeviceFeaturesSkia(
       uint32_t* /* mask of GrVkFeatureFlags */ features) const;
 
@@ -70,6 +74,7 @@ class VulkanDevice {
   VulkanHandle<VkDevice> device_;
   VulkanHandle<VkQueue> queue_;
   VulkanHandle<VkCommandPool> command_pool_;
+  VkPhysicalDeviceMemoryProperties physical_device_mem_props_;
   uint32_t graphics_queue_index_;
   bool valid_;
   bool enable_validation_layers_;

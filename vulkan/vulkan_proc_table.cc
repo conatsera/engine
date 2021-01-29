@@ -79,6 +79,9 @@ bool VulkanProcTable::SetupInstanceProcAddresses(
   ACQUIRE_PROC(GetDeviceProcAddr, handle);
   ACQUIRE_PROC(GetPhysicalDeviceFeatures, handle);
   ACQUIRE_PROC(GetPhysicalDeviceQueueFamilyProperties, handle);
+#if OS_LINUX
+  ACQUIRE_PROC(GetPhysicalDeviceMemoryProperties, handle);
+#endif
 #if OS_ANDROID
   ACQUIRE_PROC(GetPhysicalDeviceSurfaceCapabilitiesKHR, handle);
   ACQUIRE_PROC(GetPhysicalDeviceSurfaceFormatsKHR, handle);

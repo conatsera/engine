@@ -41,6 +41,8 @@ VulkanDevice::VulkanDevice(VulkanProcTable& p_vk,
     return;
   }
 
+  vk.GetPhysicalDeviceMemoryProperties(physical_device_, &physical_device_mem_props_);
+
   graphics_queue_index_ = FindGraphicsQueueIndex(GetQueueFamilyProperties());
 
   if (graphics_queue_index_ == kVulkanInvalidGraphicsQueueIndex) {
@@ -226,6 +228,24 @@ bool VulkanDevice::GetPhysicalDeviceFeatures(
   }
   vk.GetPhysicalDeviceFeatures(physical_device_, features);
   return true;
+}
+
+uint32_t VulkanDevice::GetPhysicalDeviceMemoryTypeIndex(
+    uint32_t memory_type_bits,
+    VkMemoryPropertyFlagBits memory_property_flag_bits) const {
+  // Search memtypes to find first index with those properties
+  for (uint32_t i = 0; i < physical_device_mem_props_.memoryTypeCount; i++) {
+    if ((memory_type_bits & 1) == 1) {
+      // Type is available, does it match user properties?
+      if ((physical_device_mem_props_.memoryTypes[i].propertyFlags & memory_property_flag_bits) ==
+          memory_property_flag_bits) {
+        return i;
+      }
+    }
+    memory_type_bits >>= 1;
+  }
+  // No memory types matched, return default memory type
+  return 0;
 }
 
 bool VulkanDevice::GetPhysicalDeviceFeaturesSkia(uint32_t* sk_features) const {

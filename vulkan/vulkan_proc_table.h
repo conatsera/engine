@@ -117,6 +117,7 @@ class VulkanProcTable : public fml::RefCountedThreadSafe<VulkanProcTable> {
   DEFINE_PROC(CreateAndroidSurfaceKHR);
 #elif OS_LINUX
   DEFINE_PROC(CreateXcbSurfaceKHR);
+  DEFINE_PROC(GetPhysicalDeviceMemoryProperties);
 #endif  // OS_ANDROID
 #if OS_FUCHSIA
   DEFINE_PROC(CreateBufferCollectionFUCHSIA);
