@@ -231,6 +231,16 @@ if (enable_unittests) {
 
       deps += [ "//flutter/testing:metal" ]
     }
+
+    if (test_enable_vulkan) {
+      sources += [
+        "tests/embedder_test_context_vulkan.cc",
+        "tests/embedder_test_context_vulkan.h",
+        "tests/embedder_unittests_vulkan.cc",
+      ]
+
+      deps += [ "//flutter/testing:vulkan" ]
+    }
   }
 
   # Tests the build in FLUTTER_ENGINE_NO_PROTOTYPES mode.
